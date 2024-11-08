@@ -6,12 +6,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mdi.movie.features.main.MainViewModel
 import com.mdi.movie.features.movieslist.ui.MoviesListScreen
 
 @Composable
 fun MovieAppNavGraph(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    mainViewModel: MainViewModel
 ) {
     NavHost(
         navController = navController,
@@ -20,6 +22,7 @@ fun MovieAppNavGraph(
         composable(NavigationScreenName.MOVIES_LIST_SCREEN) {
             MoviesListScreen(
                 modifier = modifier,
+                mainViewModel = mainViewModel,
                 onMovieItemClick = { movieId ->
 
                 }

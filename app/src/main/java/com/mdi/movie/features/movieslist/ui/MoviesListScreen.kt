@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mdi.movie.features.main.MainViewModel
 import com.mdi.movie.features.movieslist.ui.components.MovieItemView
 import com.mdi.movie.features.movieslist.ui.model.MovieItem
 
@@ -14,8 +16,10 @@ import com.mdi.movie.features.movieslist.ui.model.MovieItem
 fun MoviesListScreen(
     modifier: Modifier,
     viewModel: MoviesListViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel,
     onMovieItemClick: ((movieId: Int) -> Unit)? = null
 ) {
+    val selectedType = mainViewModel.selectedTypeState
     val movies = viewModel.movies
     Box(modifier = modifier) {
         MoviesListView(movies, onMovieItemClick, onFavouriteClick = { movieId ->
@@ -43,5 +47,5 @@ fun MoviesListView(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewMoviesListScreen() {
-    MoviesListScreen(modifier = Modifier, onMovieItemClick = {})
+    MoviesListScreen(modifier = Modifier, mainViewModel = hiltViewModel(), onMovieItemClick = {})
 }

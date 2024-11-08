@@ -18,11 +18,19 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Read the API key from local.properties
+        val imdbApiKey: String = project.findProperty("imdb.APIKey") as String? ?: ""
+        buildConfigField("String", "IMDB_API_KEY", "\"$imdbApiKey\"")
+
+        val baseUrl: String = project.findProperty("imdb.BaseURL") as String? ?: ""
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+
+
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -38,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -53,12 +62,20 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     //Navigation
-    implementation(libs.androidx.navigation.compose) // Check for the latest version
-
+    implementation(libs.androidx.navigation.compose)
     //Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+    //Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
