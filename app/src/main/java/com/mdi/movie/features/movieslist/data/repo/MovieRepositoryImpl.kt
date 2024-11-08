@@ -4,16 +4,16 @@ import com.mdi.movie.features.movieslist.data.datasource.local.MovieLocalDataSou
 import com.mdi.movie.features.movieslist.data.datasource.remote.MovieRemoteDataSource
 import com.mdi.movie.features.movieslist.data.model.MovieEntity
 import com.mdi.movie.features.movieslist.data.model.MoviesPagingResponse
-import com.mdi.movie.features.movieslist.data.model.MoviesType
+import com.mdi.movie.features.movieslist.domain.model.MovieParams
 import javax.inject.Inject
 
 class MovieRepositoryImpl @Inject constructor(
     private val localDataSource: MovieLocalDataSource,
     private val remoteDataSource: MovieRemoteDataSource
 ) : MovieRepository {
-    override suspend fun getMovies(
-        type: MoviesType, page: Int
-    ): MoviesPagingResponse = remoteDataSource.getMovies(type = type, page = page)
+    override suspend fun getMoviesFromRemote(
+        movieParams: MovieParams
+    ): MoviesPagingResponse = remoteDataSource.getMovies(movieParams)
 
     override suspend fun getMoviesFromLocal(): List<MovieEntity> = localDataSource.getAllMovies()
 

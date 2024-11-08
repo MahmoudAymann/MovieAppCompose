@@ -13,12 +13,20 @@ object MovieListMapper {
         rating = resItem.voteAverage ?: 0.0
     )
 
-    fun toUiMovieItem(resItem: MovieEntity): MovieItem = MovieItem(
+    private fun toUiMovieItem(resItem: MovieEntity): MovieItem = MovieItem(
         id = resItem.id,
         name = resItem.name,
         releaseDate = resItem.releaseDate,
         rating = resItem.rating,
         isFavorite = false
     )
+
+    fun listToUiListOfMovieItem(list: List<MovieEntity>): List<MovieItem> =
+        list.map { toUiMovieItem(it) }
+
+    fun resListToListOfMovieEntity(list: List<MovieListResponseItem>): List<MovieEntity> =
+        list.map {
+            toMovieEntity(it)
+        }
 
 }
