@@ -50,7 +50,6 @@ fun MovieItemView(
 @Composable
 fun PreviewMovieItemView() {
     MovieItemView(onItemClick = {}, item = MovieItem(
-        isFavorite = true,
         id = 7931,
         name = "Milagros Klein",
         releaseDate = "12/2/2020",

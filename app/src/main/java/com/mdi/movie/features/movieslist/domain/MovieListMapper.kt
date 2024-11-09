@@ -17,8 +17,7 @@ object MovieListMapper {
         id = resItem.id,
         name = resItem.name,
         releaseDate = resItem.releaseDate,
-        rating = resItem.rating,
-        isFavorite = false
+        rating = resItem.rating
     )
 
     fun listToUiListOfMovieItem(list: List<MovieEntity>): List<MovieItem> =
