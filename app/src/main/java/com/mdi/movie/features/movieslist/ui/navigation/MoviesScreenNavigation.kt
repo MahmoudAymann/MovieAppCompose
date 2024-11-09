@@ -18,7 +18,7 @@ fun MoviesScreenNavigation(
     MoviesListScreen(modifier = modifier,
         viewModel = viewModel,
         mainViewModel = mainViewModel,
-        onNavigationRequested = { effect ->
+        onNavigationRequest = { effect ->
             if (effect is MoviesContract.Effect.NavigateToMovieDetails) {
                 navController.navigateToMovieDetails(effect.movieId)
             }

@@ -6,8 +6,9 @@ import com.mdi.movie.features.movieslist.domain.model.MovieParams
 import com.mdi.movie.features.movieslist.ui.model.MovieItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class GetMoviesUseCase(
+class GetMoviesUseCase @Inject constructor(
     private val movieRepository: MovieRepository
 ) : BaseUseCaseParam<MovieParams, Flow<Result<List<MovieItem>>>> {
 

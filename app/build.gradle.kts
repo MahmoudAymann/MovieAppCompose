@@ -84,4 +84,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // test
+    testImplementation ("org.mockito:mockito-core:4.6.1") // or the latest version
+    testImplementation ("org.mockito:mockito-inline:4.6.1") // for inline mocking
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4") // for coroutine support
+
 }
