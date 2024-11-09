@@ -1,40 +1,54 @@
 package com.mdi.movie.features.movieslist.ui
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.ViewModel
-import com.mdi.movie.features.movieslist.ui.model.MovieItem
+import androidx.lifecycle.viewModelScope
+import com.mdi.movie.core.ui.viewmodel.BaseViewModel
+import com.mdi.movie.features.movieslist.domain.GetMoviesUseCase
+import com.mdi.movie.features.movieslist.domain.model.MovieParams
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MoviesListViewModel @Inject constructor() : ViewModel() {
+class MoviesListViewModel @Inject constructor(
+    private val getMoviesUseCase: GetMoviesUseCase
+) : BaseViewModel<MoviesContract.Event, MoviesContract.State, MoviesContract.Effect>() {
 
-    private val _movies = mutableStateListOf<MovieItem>()
-    val movies: List<MovieItem> get() = _movies
+    private suspend fun fetchMovies(movieParams: MovieParams) {
+        getMoviesUseCase(movieParams).collect { result ->
 
-
-    init {
-        // Initialize with a paginated list or any static list for testing
-        _movies.addAll(
-            List(100) { index ->
-                MovieItem(
-                    id = index,
-                    name = "Movie $index",
-                    releaseDate = "2022-01-01",
-                    rating = (5..10).random().toDouble()
-                )
-            }
-        )
-    }
-
-    // Toggle favorite status for a specific movie by ID
-    fun toggleFavorite(movieId: Int) {
-        val index = _movies.indexOfFirst { it.id == movieId }
-        if (index >= 0) {
-            val movie = _movies[index]
-            // Update only the specific movie in the list
-            _movies[index] = movie.copy(isFavorite = !movie.isFavorite)
         }
     }
+
+    override fun setInitialState(): MoviesContract.State = MoviesContract.State(isLoading = true)
+
+    override fun handleEvents(event: MoviesContract.Event) {
+        when (event) {
+            is MoviesContract.Event.GetMovies -> {
+                getMovies(event.movieParams)
+            }
+
+            is MoviesContract.Event.MovieSelected -> {
+                setEffect { MoviesContract.Effect.NavigateToMovieDetails(event.movieId) }
+            }
+            is MoviesContract.Event.ResetAndGetMovies -> {
+                val params = event.movieParams.copy(page = 1)
+                getMovies(params)
+            }
+        }
+    }
+
+    private fun getMovies(movieParams: MovieParams) {
+        setState { copy(isLoading = true, error = null) }
+        viewModelScope.launch {
+            getMoviesUseCase(movieParams).collect {
+                it.onSuccess {
+
+                }.onFailure {
+
+                }
+            }
+        }
+    }
+
 
 }

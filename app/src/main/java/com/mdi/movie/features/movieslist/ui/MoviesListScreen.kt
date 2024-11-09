@@ -1,45 +1,58 @@
 package com.mdi.movie.features.movieslist.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mdi.movie.core.ui.components.AppProgressBar
+import com.mdi.movie.core.ui.components.ErrorDialog
 import com.mdi.movie.features.main.MainViewModel
-import com.mdi.movie.features.movieslist.ui.components.MovieItemView
-import com.mdi.movie.features.movieslist.ui.model.MovieItem
+import com.mdi.movie.features.movieslist.domain.model.MovieParams
+import com.mdi.movie.features.movieslist.ui.components.MoviesListView
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun MoviesListScreen(
     modifier: Modifier,
-    viewModel: MoviesListViewModel = hiltViewModel(),
+    viewModel: MoviesListViewModel,
     mainViewModel: MainViewModel,
-    onMovieItemClick: ((movieId: Int) -> Unit)? = null
+    onNavigationRequest: (MoviesContract.Effect) -> Unit
 ) {
-    val selectedType = mainViewModel.selectedTypeState
-    val movies = viewModel.movies
+
+    val selectedType = mainViewModel.selectedTypeState.collectAsState()
+    //Listen for changes of movie type from action bar
+    LaunchedEffect(selectedType) {
+        viewModel.setEvent(MoviesContract.Event.ResetAndGetMovies(MovieParams(type = selectedType.value)))
+    }
+
+    //listen for effects from viewModel
+    LaunchedEffect(Unit) {
+        viewModel.effect.onEach { effect ->
+            when (effect) {
+                is MoviesContract.Effect.NavigateToMovieDetails -> onNavigationRequest.invoke(effect)
+            }
+        }
+    }
+    //Screen Layout
     Box(modifier = modifier) {
-        MoviesListView(movies, onMovieItemClick, onFavouriteClick = { movieId ->
-            viewModel.toggleFavorite(movieId)
+        MoviesScreenContent(viewModel.viewState.value, onMovieItemClick = {
+            viewModel.setEvent(MoviesContract.Event.MovieSelected(it))
         })
     }
 }
 
 @Composable
-fun MoviesListView(
-    movies: List<MovieItem>,
-    onMovieItemClick: ((movieId: Int) -> Unit)?,
-    onFavouriteClick: (movieId: Int) -> Unit
+fun MoviesScreenContent(
+    state: MoviesContract.State,
+    onMovieItemClick: (Int) -> Unit,
 ) {
-    LazyColumn {
-        items(movies) { movie ->
-            MovieItemView(item = movie,
-                onItemClick = { onMovieItemClick?.invoke(movie.id) },
-                onFavouriteClick = { onFavouriteClick.invoke(movie.id) })
-        }
+    when {
+        state.isLoading -> AppProgressBar()
+        state.error.isNullOrBlank().not() -> ErrorDialog(message = state.error!!)
+        state.moviesList.isNotEmpty() -> MoviesListView(state.moviesList, onMovieItemClick)
     }
 }
 
@@ -47,5 +60,8 @@ fun MoviesListView(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewMoviesListScreen() {
-    MoviesListScreen(modifier = Modifier, mainViewModel = hiltViewModel(), onMovieItemClick = {})
+    MoviesListScreen(modifier = Modifier,
+        mainViewModel = hiltViewModel(),
+        viewModel = hiltViewModel(),
+        onNavigationRequest = {})
 }

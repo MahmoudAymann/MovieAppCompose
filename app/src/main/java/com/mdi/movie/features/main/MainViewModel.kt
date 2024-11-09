@@ -1,13 +1,14 @@
 package com.mdi.movie.features.main
 
 import androidx.lifecycle.ViewModel
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
 import com.mdi.movie.features.movieslist.data.model.MoviesType
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class MainViewModel : ViewModel() {
-    private val _selectedTypeState = mutableStateOf(MoviesType.Popular)
-    val selectedTypeState: State<MoviesType> = _selectedTypeState
+    private val _selectedTypeState = MutableStateFlow(MoviesType.Popular)
+    val selectedTypeState: StateFlow<MoviesType> = _selectedTypeState.asStateFlow()
 
     fun updateSelectedType(type: MoviesType) {
         _selectedTypeState.value = type
