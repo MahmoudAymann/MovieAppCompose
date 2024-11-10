@@ -13,38 +13,59 @@ class MoviesListViewModel @Inject constructor(
     private val getMoviesUseCase: GetMoviesUseCase
 ) : BaseViewModel<MoviesContract.Event, MoviesContract.State, MoviesContract.Effect>() {
 
-    private suspend fun fetchMovies(movieParams: MovieParams) {
-        getMoviesUseCase(movieParams).collect { result ->
-
-        }
-    }
+    private var currentPage = 1
+    private var isLastPage = false
 
     override fun setInitialState(): MoviesContract.State = MoviesContract.State(isLoading = true)
 
     override fun handleEvents(event: MoviesContract.Event) {
         when (event) {
             is MoviesContract.Event.GetMovies -> {
-                getMovies(event.movieParams)
+                resetMoviesList()
+                val params = event.movieParams.copy(page = currentPage)
+                getMovies(params)
             }
 
             is MoviesContract.Event.MovieSelected -> {
                 setEffect { MoviesContract.Effect.NavigateToMovieDetails(event.movieId) }
             }
-            is MoviesContract.Event.ResetAndGetMovies -> {
-                val params = event.movieParams.copy(page = 1)
-                getMovies(params)
+
+            is MoviesContract.Event.LoadMore -> {
+                if (!isLastPage) {
+                    getMovies(MovieParams(type = event.type, page = currentPage))
+                }
             }
         }
     }
 
+    private fun resetMoviesList() {
+        currentPage = 1
+        isLastPage = false
+        setState { copy(moviesList = emptyList()) } // Clear the movie list
+    }
+
     private fun getMovies(movieParams: MovieParams) {
+        if (isLastPage) return
         setState { copy(isLoading = true, error = null) }
         viewModelScope.launch {
-            getMoviesUseCase(movieParams).collect {
-                it.onSuccess {
-
-                }.onFailure {
-
+            getMoviesUseCase(movieParams).collect { result ->
+                result.onSuccess { movies ->
+                    val updatedMoviesList = if (movieParams.page > 1) {
+                        viewState.value.moviesList + movies
+                    } else {
+                        movies
+                    }
+                    // Check if we reached the last page
+                    //check for empty movies for simplicity
+                    isLastPage = movies.isEmpty()
+                    setState {
+                        copy(
+                            isLoading = false, moviesList = updatedMoviesList, error = null
+                        )
+                    }
+                    currentPage++ // Increment the page for the next load
+                }.onFailure { error ->
+                    setState { copy(isLoading = false, error = error.message) }
                 }
             }
         }

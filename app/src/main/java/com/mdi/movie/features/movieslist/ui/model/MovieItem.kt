@@ -6,6 +6,7 @@ import com.mdi.movie.core.utils.UIModel
 data class MovieItem(
     val id: Int,
     val name: String,
+    val image:String,
     val releaseDate: String,
     val rating: Double
 )

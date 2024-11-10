@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,16 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt)
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val apiKey: String = localProperties.getProperty("APIKey") ?: ""
+val baseURL: String = localProperties.getProperty("BaseURL") ?: ""
+val imageBaseURL: String = localProperties.getProperty("ImageBaseURL") ?: ""
 
 android {
     namespace = "com.mdi.movie"
@@ -19,11 +31,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Read the API key from local.properties
-        val imdbApiKey: String = project.findProperty("imdb.APIKey") as String? ?: ""
-        buildConfigField("String", "IMDB_API_KEY", "\"$imdbApiKey\"")
 
-        val baseUrl: String = project.findProperty("imdb.BaseURL") as String? ?: ""
-        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        buildConfigField("String", "IMDB_API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "BASE_URL", "\"$baseURL\"")
+        buildConfigField("String", "IMAGE_BASE_URL", "\"$imageBaseURL\"")
 
 
     }
@@ -75,7 +86,10 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
-
+    //Collections
+    implementation(libs.kotlinx.collections.immutable)
+    //Image Loading
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -85,8 +99,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     // test
-    testImplementation ("org.mockito:mockito-core:4.6.1") // or the latest version
-    testImplementation ("org.mockito:mockito-inline:4.6.1") // for inline mocking
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4") // for coroutine support
+    testImplementation (libs.mockito.core)
+    testImplementation (libs.mockito.inline)
+    testImplementation (libs.kotlinx.coroutines.test)
 
 }
