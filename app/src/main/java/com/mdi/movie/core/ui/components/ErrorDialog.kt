@@ -39,7 +39,7 @@ fun ErrorDialog(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Black.copy(alpha = 0.5f)),
+            .background(color = Color.Gray.copy(alpha = 0.2f)),
         contentAlignment = Alignment.Center
     ) {
         Card(

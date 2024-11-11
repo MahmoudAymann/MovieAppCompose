@@ -1,7 +1,7 @@
 package com.mdi.movie.features.main
 
 import androidx.lifecycle.ViewModel
-import com.mdi.movie.features.movieslist.data.model.MoviesType
+import com.mdi.movie.features.movies.movieslist.data.model.MoviesType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

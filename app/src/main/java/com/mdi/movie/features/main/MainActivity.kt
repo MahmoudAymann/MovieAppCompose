@@ -26,7 +26,8 @@ import com.mdi.movie.core.navigation.AppNavigation.Routes.MOVIE_DETAILS_SCREEN
 import com.mdi.movie.core.navigation.MovieAppNavGraph
 import com.mdi.movie.core.ui.components.AppActionBar
 import com.mdi.movie.core.ui.theme.MovieAppTheme
-import com.mdi.movie.features.movieslist.data.model.MoviesType
+import com.mdi.movie.features.movies.movieslist.data.model.MoviesType
+
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

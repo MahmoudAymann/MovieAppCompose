@@ -11,7 +11,7 @@ class ApiKeyInterceptor : Interceptor {
 
         // Append the api_key to the request URL
         val newUrl = originalUrl.newBuilder()
-            .addQueryParameter("api_key", BuildConfig.IMDB_API_KEY)
+            .addQueryParameter("api_key", BuildConfig.TMDB_API_KEY)
             .build()
 
         // Create a new request with the updated URL
