@@ -42,12 +42,8 @@ fun MainContent(mainViewModel: MainViewModel) {
     var selectedTypeState by remember { mutableStateOf(MoviesType.Popular) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
-
     Scaffold(topBar = {
         AppActionBar(stringResource(id = R.string.app_name),
-            onBackIconClick = {
-
-            },
             onTypeSelected = { selectedType ->
                 selectedTypeState = selectedType
                 //send the action to movies list screen

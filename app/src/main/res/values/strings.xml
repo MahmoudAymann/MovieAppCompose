@@ -5,4 +5,6 @@
     <string name="dismiss">Dismiss</string>
     <string name="retry">Retry</string>
     <string name="error">Error</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="preview_date">12/2/2020</string>
 </resources>

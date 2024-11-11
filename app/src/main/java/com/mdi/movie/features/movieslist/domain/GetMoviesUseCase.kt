@@ -18,24 +18,25 @@ class GetMoviesUseCase @Inject constructor(
             val localMovies = movieRepository.getMoviesFromLocal()
             if (localMovies.isNotEmpty()) {
                 emit(Result.success(MovieListMapper.listToUiListOfMovieItem(localMovies)))
-            } else {
-                try {
-                    // Fetch from remote if local data is empty
-                    val response = movieRepository.getMoviesFromRemote(params)
-
-                    // Map response to MovieEntity and store in local cache
-                    val movies = response.moviesList?.filterNotNull()?.map { movie ->
-                        MovieListMapper.toMovieEntity(movie)
-                    } ?: emptyList()
-
-                    // Cache the fetched movies
-                    movieRepository.saveMoviesToLocal(movies)
-
-                    // Emit the movies as a success result to UI after caching
-                    emit(Result.success(MovieListMapper.listToUiListOfMovieItem(movies)))
-                } catch (e: Exception) {
-                    emit(Result.failure(e))
-                }
             }
+            //Do fetch from remote
+            try {
+                // Fetch from remote if local data is empty
+                val response = movieRepository.getMoviesFromRemote(params)
+
+                // Map response to MovieEntity and store in local cache
+                val movies = response.moviesList?.filterNotNull()?.map { movie ->
+                    MovieListMapper.toMovieEntity(movie)
+                } ?: emptyList()
+
+                // Cache the fetched movies
+                movieRepository.saveMoviesToLocal(movies)
+
+                // Emit the movies as a success result to UI after caching
+                emit(Result.success(MovieListMapper.listToUiListOfMovieItem(movies)))
+            } catch (e: Exception) {
+                emit(Result.failure(e))
+            }
+
         }
 }
