@@ -32,7 +32,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Read the API key from local.properties
 
-        buildConfigField("String", "IMDB_API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "TMDB_API_KEY", "\"$apiKey\"")
         buildConfigField("String", "BASE_URL", "\"$baseURL\"")
         buildConfigField("String", "IMAGE_BASE_URL", "\"$imageBaseURL\"")
 

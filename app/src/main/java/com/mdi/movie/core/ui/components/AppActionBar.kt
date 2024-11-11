@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.mdi.movie.R
-import com.mdi.movie.features.movieslist.data.model.MoviesType
+import com.mdi.movie.features.movies.movieslist.data.model.MoviesType
 
 
 @OptIn(ExperimentalMaterial3Api::class)
