@@ -16,6 +16,7 @@ import com.mdi.movie.features.main.MainViewModel
 import com.mdi.movie.features.movieslist.domain.model.MovieParams
 import com.mdi.movie.features.movieslist.ui.components.MoviesListView
 import com.mdi.movie.features.movieslist.ui.model.MovieItem
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 @Composable
@@ -39,7 +40,7 @@ fun MoviesListScreen(
             when (effect) {
                 is MoviesContract.Effect.NavigateToMovieDetails -> onNavigationRequest.invoke(effect)
             }
-        }
+        }.collect()
     }
     //Screen Layout
     Box(modifier = modifier) {

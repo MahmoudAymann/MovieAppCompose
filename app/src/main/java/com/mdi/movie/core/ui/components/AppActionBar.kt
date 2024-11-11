@@ -27,50 +27,43 @@ fun AppActionBar(
     title: String?,
     onBackIconClick: (() -> Unit)? = null,
     onTypeSelected: (MoviesType) -> Unit,
-    isDropdownExpanded: Boolean,
-    onDropdownToggle: () -> Unit
+    isDropdownExpanded: Boolean = false,
+    showDropDownMenu: Boolean = false,
+    onDropdownToggle: () -> Unit = {}
 ) {
-    TopAppBar(
-        title = { Text(title.orEmpty()) },
-        navigationIcon = {
-            onBackIconClick?.let {
-                IconButton(onClick = { onBackIconClick.invoke() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                        contentDescription = "Back"
-                    )
+    TopAppBar(title = { Text(title.orEmpty()) }, navigationIcon = {
+        onBackIconClick?.let {
+            IconButton(onClick = { onBackIconClick.invoke() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        }
+    }, actions = {
+        // Add the dropdown menu button
+        if (showDropDownMenu) Box {
+            IconButton(onClick = onDropdownToggle) {
+                Icon(Icons.Default.MoreVert, contentDescription = "Filter Options")
+            }
+            DropdownMenu(
+                expanded = isDropdownExpanded, onDismissRequest = onDropdownToggle
+            ) {
+                MoviesType.entries.forEach { type ->
+                    DropdownMenuItem(text = {
+                        Text(text = type.name.replaceFirstChar { it.uppercase() })
+                    }, onClick = {
+                        onTypeSelected(type)
+                        onDropdownToggle() // Close the dropdown after selection
+                    })
                 }
             }
-        },
-        actions = {
-            // Add the dropdown menu button
-            Box {
-                IconButton(onClick = onDropdownToggle) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Filter Options")
-                }
-                DropdownMenu(
-                    expanded = isDropdownExpanded,
-                    onDismissRequest = onDropdownToggle
-                ) {
-                    MoviesType.entries.forEach { type ->
-                        DropdownMenuItem(
-                            text = {                                 
-                                Text(text = type.name.replaceFirstChar { it.uppercase() })
-                            },
-                            onClick = {
-                                onTypeSelected(type)
-                                onDropdownToggle() // Close the dropdown after selection
-                            }
-                        )
-                    }
-                }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = Color.White,
-            actionIconContentColor = Color.White
-        )
+        }
+    }, colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        titleContentColor = Color.White,
+        actionIconContentColor = Color.White
+    )
     )
 }
 

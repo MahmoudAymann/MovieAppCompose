@@ -16,7 +16,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.mdi.movie.R
+import com.mdi.movie.core.navigation.AppNavigation.Routes.MOVIES_LIST_SCREEN
+import com.mdi.movie.core.navigation.AppNavigation.Routes.MOVIE_DETAILS_SCREEN
 import com.mdi.movie.core.navigation.MovieAppNavGraph
 import com.mdi.movie.core.ui.components.AppActionBar
 import com.mdi.movie.core.ui.theme.MovieAppTheme
@@ -39,28 +45,53 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent(mainViewModel: MainViewModel) {
-    var selectedTypeState by remember { mutableStateOf(MoviesType.Popular) }
-    var isDropdownExpanded by remember { mutableStateOf(false) }
 
-    Scaffold(topBar = {
-        AppActionBar(stringResource(id = R.string.app_name),
-            onTypeSelected = { selectedType ->
-                selectedTypeState = selectedType
-                //send the action to movies list screen
-                mainViewModel.updateSelectedType(selectedType)
-            },
-            isDropdownExpanded = isDropdownExpanded,
-            onDropdownToggle = {
-                isDropdownExpanded = !isDropdownExpanded
-            })
-    }) { padding ->
+    val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+
+    Scaffold(topBar = { GetMyTopBar(currentBackStackEntry, mainViewModel, navController) }) { padding ->
         MovieAppNavGraph(
             modifier = Modifier
                 .padding(padding)
                 .then(Modifier.padding(8.dp)),
-            mainViewModel = mainViewModel
+            mainViewModel = mainViewModel,
+            navController = navController
         )
     }
+}
+
+@Composable
+private fun GetMyTopBar(
+    currentBackStackEntry: NavBackStackEntry?,
+    mainViewModel: MainViewModel,
+    navController: NavHostController
+) {
+    var selectedTypeState by remember { mutableStateOf(MoviesType.Popular) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+
+    // Determine if the back button should be shown based on the current route
+    val showBackButton = getBackButtonScreen(currentBackStackEntry)
+    val showDropDownMenu = getDropDownMenuScreen(currentBackStackEntry)
+
+    AppActionBar(stringResource(id = R.string.app_name),
+        onTypeSelected = { selectedType ->
+        selectedTypeState = selectedType
+        //send the action to movies list screen
+        mainViewModel.updateSelectedType(selectedType)
+    }, isDropdownExpanded = isDropdownExpanded,
+        onDropdownToggle = { isDropdownExpanded = !isDropdownExpanded },
+        onBackIconClick = if (showBackButton) { { navController.popBackStack() }
+    } else null,
+        showDropDownMenu = showDropDownMenu)
+
+}
+
+private fun getDropDownMenuScreen(currentBackStackEntry: NavBackStackEntry?): Boolean {
+    return currentBackStackEntry?.destination?.route == MOVIES_LIST_SCREEN
+}
+
+private fun getBackButtonScreen(currentBackStackEntry: NavBackStackEntry?): Boolean {
+    return currentBackStackEntry?.destination?.route == MOVIE_DETAILS_SCREEN
 }
 
 @Preview(showBackground = true, showSystemUi = true)
