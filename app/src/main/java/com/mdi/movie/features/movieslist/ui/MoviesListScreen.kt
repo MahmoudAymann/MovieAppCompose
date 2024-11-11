@@ -16,6 +16,7 @@ import com.mdi.movie.features.main.MainViewModel
 import com.mdi.movie.features.movieslist.domain.model.MovieParams
 import com.mdi.movie.features.movieslist.ui.components.MoviesListView
 import com.mdi.movie.features.movieslist.ui.model.MovieItem
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 @Composable
@@ -35,9 +36,9 @@ fun MoviesListScreen(
 
     //listen for effects from viewModel
     LaunchedEffect(Unit) {
-        viewModel.effect.onEach { effect ->
-            when (effect) {
-                is MoviesContract.Effect.NavigateToMovieDetails -> onNavigationRequest.invoke(effect)
+        viewModel.effect.collect {
+            when(it){
+                is MoviesContract.Effect.NavigateToMovieDetails -> onNavigationRequest.invoke(it)
             }
         }
     }

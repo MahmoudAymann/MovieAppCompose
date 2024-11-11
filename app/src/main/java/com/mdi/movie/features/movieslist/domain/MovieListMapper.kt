@@ -1,6 +1,7 @@
 package com.mdi.movie.features.movieslist.domain
 
 import com.mdi.movie.BuildConfig
+import com.mdi.movie.features.moviedetails.ui.model.MovieDetails
 import com.mdi.movie.features.movieslist.data.model.MovieEntity
 import com.mdi.movie.features.movieslist.data.model.MovieListResponseItem
 import com.mdi.movie.features.movieslist.ui.model.MovieItem
@@ -12,7 +13,9 @@ object MovieListMapper {
         name = resItem.title.orEmpty(),
         image = "${BuildConfig.IMAGE_BASE_URL}${resItem.posterPath}",
         releaseDate = resItem.releaseDate.orEmpty(),
-        rating = resItem.voteAverage ?: 0.0
+        rating = resItem.voteAverage ?: 0.0,
+        overview = resItem.overview.orEmpty(),
+        genres = resItem.genres?.mapNotNull { it.name }.orEmpty()
     )
 
     private fun toUiMovieItem(resItem: MovieEntity): MovieItem = MovieItem(
@@ -25,5 +28,15 @@ object MovieListMapper {
 
     fun listToUiListOfMovieItem(list: List<MovieEntity>): List<MovieItem> =
         list.map { toUiMovieItem(it) }
+
+    fun MovieEntity.toMovieDetails() = MovieDetails(
+        id = id,
+        name = name,
+        image = image,
+        releaseDate = releaseDate,
+        rating = rating,
+        overview = overview,
+        genres = genres
+    )
 
 }

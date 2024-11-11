@@ -1,6 +1,7 @@
 package com.mdi.movie.core.di
 
 import com.mdi.movie.BuildConfig
+import com.mdi.movie.core.network.ApiKeyInterceptor
 import com.mdi.movie.core.network.ApiServices
 import dagger.Module
 import dagger.Provides
@@ -26,14 +27,24 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
-        return OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
+    fun provideApiKeyInterceptor(): ApiKeyInterceptor {
+        return ApiKeyInterceptor()
+    }
+
+
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor, apiKeyInterceptor: ApiKeyInterceptor): OkHttpClient {
+        return OkHttpClient.Builder().addInterceptor(loggingInterceptor).addInterceptor(apiKeyInterceptor).build()
     }
 
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder().baseUrl(BuildConfig.BASE_URL).client(okHttpClient)
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create()).build()
     }
 

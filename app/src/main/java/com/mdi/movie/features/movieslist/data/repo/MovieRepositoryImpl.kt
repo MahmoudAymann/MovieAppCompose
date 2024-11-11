@@ -3,6 +3,7 @@ package com.mdi.movie.features.movieslist.data.repo
 import com.mdi.movie.features.movieslist.data.datasource.local.MovieLocalDataSource
 import com.mdi.movie.features.movieslist.data.datasource.remote.MovieRemoteDataSource
 import com.mdi.movie.features.movieslist.data.model.MovieEntity
+import com.mdi.movie.features.movieslist.data.model.MovieListResponseItem
 import com.mdi.movie.features.movieslist.data.model.MoviesPagingResponse
 import com.mdi.movie.features.movieslist.domain.model.MovieParams
 import javax.inject.Inject
@@ -21,5 +22,12 @@ class MovieRepositoryImpl @Inject constructor(
         localDataSource.saveMovies(movies)
 
     override suspend fun clearLocalMovies() = localDataSource.clearMovies()
+    override suspend fun getMovieDetailsFromLocal(movieId: Int): MovieEntity? {
+        return localDataSource.getMovieById(movieId)
+    }
+
+    override suspend fun getMovieDetailsFromRemote(movieId: Int): MovieListResponseItem {
+        return remoteDataSource.getMovieDetails(movieId)
+    }
 
 }
