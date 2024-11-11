@@ -75,7 +75,7 @@ fun MovieDetailsContent(item: MovieDetails) {
         // Movie Image
         Image(
             painter = rememberAsyncImagePainter(model = item.image),
-            contentDescription = "Movie Poster",
+            contentDescription = stringResource(id = R.string.movie_poster),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
@@ -148,20 +148,4 @@ fun MovieDetailsContent(item: MovieDetails) {
             text = item.overview, style = MaterialTheme.typography.bodySmall, color = Color.Gray
         )
     }
-}
-
-@Preview
-@Composable
-fun PreviewDetailsScreen(){
-    MovieDetailsContent(
-        MovieDetails(
-            id = 7835,
-            name = "Kristy Anthony",
-            image = "mazim",
-            releaseDate = "dapibus",
-            rating = 16.17,
-            overview = "montes",
-            genres = listOf("hi", "fr")
-        )
-    )
 }

@@ -1,12 +1,13 @@
-package com.mdi.movie.movieslist
+package com.mdi.movie.moviedetails
 
+import com.mdi.movie.features.moviedetails.domain.GetMovieDetailsUseCase
 import com.mdi.movie.features.movieslist.data.model.MovieEntity
 import com.mdi.movie.features.movieslist.data.model.MovieListResponseItem
 import com.mdi.movie.features.movieslist.data.model.MoviesPagingResponse
 import com.mdi.movie.features.movieslist.data.model.MoviesType
 import com.mdi.movie.features.movieslist.data.repo.MovieRepository
-import com.mdi.movie.features.movieslist.domain.GetMoviesUseCase
 import com.mdi.movie.features.movieslist.domain.MovieListMapper
+import com.mdi.movie.features.movieslist.domain.MovieListMapper.toMovieDetails
 import com.mdi.movie.features.movieslist.domain.model.MovieParams
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -25,12 +26,12 @@ import org.junit.Test
 class GetMoviesUseCaseTest {
 
     private val movieRepository: MovieRepository = mockk()
-    private lateinit var getMoviesUseCase: GetMoviesUseCase
+    private lateinit var getMovieDetailsUseCase: GetMovieDetailsUseCase
 
     @Before
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
-        getMoviesUseCase = GetMoviesUseCase(movieRepository)
+        getMovieDetailsUseCase = GetMovieDetailsUseCase(movieRepository)
     }
 
     @After
@@ -39,32 +40,35 @@ class GetMoviesUseCaseTest {
     }
 
     @Test
-    fun `invoke should emit local movies if available first`() = runTest {
+    fun `invoke should emit local movie if available first`() = runTest {
         // Arrange
-        val localMovies = listOf(
-            MovieEntity(
-                id = 1, name = "Test Movie", releaseDate = "2021-01-01", rating = 4.5, image = "",
-                overview = "",
-                genres = listOf()
-            )
+        val localMovie = MovieEntity(
+            id = 1,
+            name = "Test Movie",
+            releaseDate = "2021-01-01",
+            rating = 4.5,
+            image = "",
+            overview = "",
+            genres = listOf()
         )
 
         // Act
-        coEvery { movieRepository.getMoviesFromLocal() } returns localMovies
-        val result = getMoviesUseCase(MovieParams(type = MoviesType.Popular, page = 1)).toList()
+        coEvery { movieRepository.getMovieDetailsFromLocal(localMovie.id) } returns localMovie
+        val result =
+            getMovieDetailsUseCase(localMovie.id).toList()
         // Assert
         assertEquals(
-            MovieListMapper.listToUiListOfMovieItem(localMovies), result.first().getOrNull()
+            localMovie.toMovieDetails(), result.first().getOrNull()
         )
     }
 
     @Test
-    fun `invoke should fetch movies from remote if local is empty`() = runTest {
+    fun `invoke should fetch movie details from remote if local is empty`() = runTest {
         // Arrange
         val movieRes = MovieListResponseItem(
             adult = null,
             backdropPath = null,
-            id = null,
+            id = 123,
             originalLanguage = null,
             originalTitle = null,
             overview = null,
@@ -74,23 +78,14 @@ class GetMoviesUseCaseTest {
             voteAverage = null,
             genres = listOf()
         )
-        val response = MoviesPagingResponse(
-            page = 1, moviesList = listOf(movieRes), totalPages = 1, totalResults = 1
-        )
-        val entityMovies = listOf(MovieListMapper.toMovieEntity(movieRes))
-
-
         // Act
+        coEvery { movieRepository.getMovieDetailsFromLocal(movieRes.id!!) } returns null
+        coEvery { movieRepository.getMovieDetailsFromRemote(movieRes.id!!) } returns movieRes
 
-        coEvery { movieRepository.getMoviesFromLocal() } returns emptyList()
-        coEvery { movieRepository.getMoviesFromRemote(MovieParams(MoviesType.Popular)) } returns response
-        coEvery { movieRepository.saveMoviesToLocal(entityMovies) } returns Unit
-
-        val result = getMoviesUseCase(MovieParams(MoviesType.Popular)).toList()
+        val result = getMovieDetailsUseCase(movieRes.id!!).toList()
         // Assert
         assertEquals(
-            result.first().getOrNull(),
-            MovieListMapper.listToUiListOfMovieItem(entityMovies)
+            result.first().getOrNull(), MovieListMapper.toMovieEntity(movieRes).toMovieDetails()
         )
     }
 
@@ -99,13 +94,14 @@ class GetMoviesUseCaseTest {
         // Arrange
         val error = "Runtime Exception"
 
+
         // Act
-        coEvery { movieRepository.getMoviesFromLocal() } returns emptyList()
-        coEvery { movieRepository.getMoviesFromRemote(MovieParams(MoviesType.Popular)) } throws Exception(
+        coEvery { movieRepository.getMovieDetailsFromLocal(1) } returns null
+        coEvery { movieRepository.getMovieDetailsFromRemote(1) } throws Exception(
             error
         )
 
-        val result = getMoviesUseCase(MovieParams(MoviesType.Popular)).toList()
+        val result = getMovieDetailsUseCase(1).toList()
 
         // Assert
         assert(result.first().isFailure)
