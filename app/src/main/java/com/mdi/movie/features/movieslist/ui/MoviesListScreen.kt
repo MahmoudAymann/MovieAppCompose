@@ -36,11 +36,11 @@ fun MoviesListScreen(
 
     //listen for effects from viewModel
     LaunchedEffect(Unit) {
-        viewModel.effect.onEach { effect ->
-            when (effect) {
-                is MoviesContract.Effect.NavigateToMovieDetails -> onNavigationRequest.invoke(effect)
+        viewModel.effect.collect {
+            when(it){
+                is MoviesContract.Effect.NavigateToMovieDetails -> onNavigationRequest.invoke(it)
             }
-        }.collect()
+        }
     }
     //Screen Layout
     Box(modifier = modifier) {
