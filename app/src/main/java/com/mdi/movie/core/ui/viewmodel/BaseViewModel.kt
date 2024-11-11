@@ -57,7 +57,7 @@ abstract class BaseViewModel<Event: ViewEvent, UiState: ViewState, Effect: ViewS
         viewModelScope.launch { _event.emit(event) }
     }
 
-    protected fun setState(reducer: UiState.() -> UiState) {
+    fun setState(reducer: UiState.() -> UiState) {
         val newState = viewState.value.reducer()
         _viewState.value = newState
     }
