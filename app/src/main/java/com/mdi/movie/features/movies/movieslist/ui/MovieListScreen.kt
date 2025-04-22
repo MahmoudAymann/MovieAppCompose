@@ -25,21 +25,7 @@ fun MoviesListScreen(
     onNavigationRequest: (MovieListContract.Effect) -> Unit
 ) {
     val rememberListState = rememberLazyListState()
-    val selectedType by mainViewModel.selectedTypeState.collectAsState()
 
-    //Listen for changes of movie type from action bar
-    LaunchedEffect(selectedType) {
-        viewModel.setEvent(MovieListContract.Event.GetMovies(MovieParams(type = selectedType)))
-    }
-
-    //listen for effects from viewModel
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect {
-            when(it){
-                is MovieListContract.Effect.NavigateToMovieDetails -> onNavigationRequest.invoke(it)
-            }
-        }
-    }
     //Screen Layout
     Box(modifier = modifier) {
         MoviesScreenContent(viewModel.viewState.value, onLoadNextPage = {

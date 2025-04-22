@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.material3) // or latest
     //Navigation
     implementation(libs.androidx.navigation.compose)
     //Hilt
@@ -97,6 +98,22 @@ dependencies {
     testImplementation (libs.junit.jupiter)
     testImplementation(libs.androidx.core.testing)
 
+    implementation(libs.github.glide)
+    implementation(libs.androidx.viewbinding)
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.emoji.google)
+    implementation(libs.google.webrtc)
+    implementation(libs.socket.io)
+    implementation(libs.shimmerlayout)
 
+    implementation("com.google.android.material:material:1.11.0") // Material 2 for views
+    implementation("androidx.compose.material3:material3:1.2.1")
+
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
 
 }

@@ -1,5 +1,6 @@
 package com.mdi.movie.features.main
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +21,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.chat.chatsdk.ChatSdkManager
 import com.mdi.movie.R
 import com.mdi.movie.core.navigation.AppNavigation.Routes.MOVIES_LIST_SCREEN
 import com.mdi.movie.core.navigation.AppNavigation.Routes.MOVIE_DETAILS_SCREEN
@@ -27,21 +29,49 @@ import com.mdi.movie.core.navigation.MovieAppNavGraph
 import com.mdi.movie.core.ui.components.AppActionBar
 import com.mdi.movie.core.ui.theme.MovieAppTheme
 import com.mdi.movie.features.movies.movieslist.data.model.MoviesType
-
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initChatSDK()
         enableEdgeToEdge()
         setContent {
             MovieAppTheme {
                 val mainViewModel: MainViewModel = hiltViewModel()
                 MainContent(mainViewModel = mainViewModel)
+
             }
         }
+
+
     }
+}
+
+private fun addUser(
+    context: Context,
+    id: String, phone: String
+) {
+    val name = "User-$id"
+    ChatSdkManager.addUser(
+        context = context,
+        userIdReq = id,
+        userNameReq = name,
+        countryCodeReq = "+20",
+        mobileNumberReq = phone,
+        emailReq = "$name.gmail.com",
+        profileReq = "https://picsum.photos/200"
+    )
+
+}
+
+private fun initChatSDK() {
+    ChatSdkManager.configured(
+        appId = "0fd58c238f63cd82",
+        appKey = "33297d60bcb323349d3709f5fbabe28d",
+        language = "ENGLISH"
+    )
 }
 
 @Composable
@@ -50,7 +80,13 @@ fun MainContent(mainViewModel: MainViewModel) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
-    Scaffold(topBar = { GetMyTopBar(currentBackStackEntry, mainViewModel, navController) }) { padding ->
+    Scaffold(topBar = {
+        GetMyTopBar(
+            currentBackStackEntry,
+            mainViewModel,
+            navController
+        )
+    }) { padding ->
         MovieAppNavGraph(
             modifier = Modifier
                 .padding(padding)
@@ -74,15 +110,17 @@ private fun GetMyTopBar(
     val showBackButton = getBackButtonScreen(currentBackStackEntry)
     val showDropDownMenu = getDropDownMenuScreen(currentBackStackEntry)
 
-    AppActionBar(stringResource(id = R.string.app_name),
+    AppActionBar(
+        stringResource(id = R.string.app_name),
         onTypeSelected = { selectedType ->
-        selectedTypeState = selectedType
-        //send the action to movies list screen
-        mainViewModel.updateSelectedType(selectedType)
-    }, isDropdownExpanded = isDropdownExpanded,
+            selectedTypeState = selectedType
+            //send the action to movies list screen
+            mainViewModel.updateSelectedType(selectedType)
+        }, isDropdownExpanded = isDropdownExpanded,
         onDropdownToggle = { isDropdownExpanded = !isDropdownExpanded },
-        onBackIconClick = if (showBackButton) { { navController.popBackStack() }
-    } else null,
+        onBackIconClick = if (showBackButton) {
+            { navController.popBackStack() }
+        } else null,
         showDropDownMenu = showDropDownMenu)
 
 }
